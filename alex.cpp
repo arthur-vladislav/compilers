@@ -14,7 +14,7 @@ int start(ifstream &src, int &line) {
     src >> noskipws >> c;
     while (c == ' ' || c == '\n' || c == '\t') {
         if (c == '\n') line++;
-        if (c == '/') {
+        if (c == '/') { // comentario ou divisao
             src >> noskipws >> c;
             if (c == '*') {
                 comments(src, line);
@@ -25,7 +25,7 @@ int start(ifstream &src, int &line) {
     }
     if (regex_match(&c, regex("\d"))) {
         lexema.append(&c);
-        token = integer(src, lexema);
+        token = number(src, lexema);
     }
     else if (regex_match(&c, regex("\w"))) {
         lexema.append(&c);
@@ -93,7 +93,7 @@ int start(ifstream &src, int &line) {
     }
 }
 
-int integer(ifstream &src, string lexema) {
+int number(ifstream &src, string lexema) {
     char c;
     src >> noskipws >> c;
 
