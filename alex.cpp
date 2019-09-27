@@ -175,9 +175,11 @@ void comments(ifstream &src, int &line) {
     char c;
     src >> noskipws >> c;
     while(true) {
+        if (c == '\n') line++;
         if (c == '*') {
             src >> noskipws >> c;
             if (c == '/') break;
         }
+        src >> noskipws >> c;
     }
 }
