@@ -7,7 +7,7 @@ using namespace std;
 class tabela_simbolos{
 
 private:
-  unordered_map<string,int> symbols;
+  unordered_map<string, int> symbols;
   int posicao;
 
 public:

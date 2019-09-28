@@ -1,13 +1,108 @@
-#include <string>
-#include <iostream>
-#include <fstream>
-#include <regex>
 #include "symbols.cpp"
 #include "DICIONARIO.h"
+#include <regex>
+#include <string>
+#include <fstream>
+#include <iostream>
 
 using namespace std;
 
 extern tabela_simbolos table;
+
+int number(ifstream &src, string lexema) {
+    char c;
+    src >> noskipws >> c;
+
+    if (regex_match(lexema, regex("(0)")) && c == 'h') {
+        lexema.append(&c);
+        src >> noskipws >> c;
+        if (!regex_match(&c, regex("[0-9a-fA-F]"))) return 0;
+        lexema.append(&c);
+        src >> noskipws >> c;
+        if (!regex_match(&c, regex("[0-9a-fA-F]"))) return 0;
+        lexema.append(&c);
+        return T_VALUE;
+    }
+
+    while(regex_match(&c, regex("\d"))) {
+        lexema.append(&c);
+        src >> noskipws >> c;
+    }
+    src.seekg(-1, ios::cur); // devolve c
+    return T_VALUE;
+}
+
+int words(ifstream &src, string lexema){
+    char c;
+    src >> noskipws >> c;
+    while (regex_match(&c, regex("(\w|\d|_)"))) {
+        lexema.append(&c);
+        src >> noskipws >> c;
+    }
+    
+    int token = table.eh_palavra_reservada(lexema);
+    if (token == 101) {
+        table.add_id(lexema);
+    }
+    src.seekg(-1, ios::cur);
+    return token;
+}
+
+int equals(ifstream & src, string lexema) {
+    char c;
+    src >> noskipws >> c;
+    if (c == '=') {
+        lexema.append(&c);
+        return T_EQUALS;
+    }
+    src.seekg(-1, ios::cur);
+    return T_ATRIBUICAO;
+}
+
+int greater_than(ifstream &src, string lexema) {
+    char c;
+    src >> noskipws >> c;
+    if (c == '=') {
+        lexema.append(&c);
+        return T_GREATER_THAN_EQUAL;
+    }
+    src.seekg(-1, ios::cur);
+    return T_GREATER_THAN;
+}
+
+int lesser_than(ifstream &src, string lexema) {
+    char c;
+    src >> noskipws >> c;
+    if (c == '=') {
+        lexema.append(&c);
+        return T_LESSER_THAN_EQUAL;
+    }
+    src.seekg(-1, ios::cur);
+    return T_LESSER_THAN;
+}
+
+int not_equal(ifstream &src, string lexema) {
+    char c;
+    src >> noskipws >> c;
+    if (c == '=') {
+        lexema.append(&c);
+        return T_NOT_EQUAL;
+    }
+    return LEX_ERROR;
+}
+
+void comments(ifstream &src, int &line) {
+    char c;
+    src >> noskipws >> c;
+    while(true) {
+        if (c == '\n') line++;
+        if (c == '*') {
+            src >> noskipws >> c;
+            if (c == '/') break;
+        }
+        src >> noskipws >> c;
+    }
+}
 
 int start(ifstream &src, int &line) {
     string lexema;
@@ -99,99 +194,4 @@ int start(ifstream &src, int &line) {
         }
     }
     return token;
-}
-
-int number(ifstream &src, string lexema) {
-    char c;
-    src >> noskipws >> c;
-
-    if (regex_match(lexema, regex("(0)")) && c == 'h') {
-        lexema.append(&c);
-        src >> noskipws >> c;
-        if (!regex_match(&c, regex("[0-9a-fA-F]"))) return 0;
-        lexema.append(&c);
-        src >> noskipws >> c;
-        if (!regex_match(&c, regex("[0-9a-fA-F]"))) return 0;
-        lexema.append(&c);
-        return T_VALUE;
-    }
-
-    while(regex_match(&c, regex("\d"))) {
-        lexema.append(&c);
-        src >> noskipws >> c;
-    }
-    src.seekg(-1, ios::cur); // devolve c
-    return T_VALUE;
-}
-
-int words(ifstream &src, string lexema){
-    char c;
-    src >> noskipws >> c;
-    while (regex_match(&c, regex("(\w|\d|_)"))) {
-        lexema.append(&c);
-        src >> noskipws >> c;
-    }
-    
-    int token = table.eh_palavra_reservada(lexema);
-    if (token == 101) {
-        table.add_id(lexema);
-    }
-    src.seekg(-1, ios::cur);
-    return token;
-}
-
-int equals(ifstream & src, string lexema) {
-    char c;
-    src >> noskipws >> c;
-    if (c == '=') {
-        lexema.append(&c);
-        return T_EQUALS;
-    }
-    src.seekg(-1, ios::cur);
-    return T_ATRIBUICAO;
-}
-
-int greater_than(ifstream &src, string lexema) {
-    char c;
-    src >> noskipws >> c;
-    if (regex_match(&c, regex("="))) {
-        lexema.append(&c);
-        return T_GREATER_THAN_EQUAL;
-    }
-    src.seekg(-1, ios::cur);
-    return T_GREATER_THAN;
-}
-
-int lesser_than(ifstream &src, string lexema) {
-    char c;
-    src >> noskipws >> c;
-    if (regex_match(&c, regex("="))) {
-        lexema.append(&c);
-        return T_LESSER_THAN_EQUAL;
-    }
-    src.seekg(-1, ios::cur);
-    return T_LESSER_THAN;
-}
-
-int not_equal(ifstream &src, string lexema) {
-    char c;
-    src >> noskipws >> c;
-    if (regex_match(&c, regex("="))) {
-        lexema.append(&c);
-        return T_NOT_EQUAL;
-    }
-    return LEX_ERROR;
-}
-
-void comments(ifstream &src, int &line) {
-    char c;
-    src >> noskipws >> c;
-    while(true) {
-        if (c == '\n') line++;
-        if (c == '*') {
-            src >> noskipws >> c;
-            if (c == '/') break;
-        }
-        src >> noskipws >> c;
-    }
 }
