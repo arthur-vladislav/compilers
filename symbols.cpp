@@ -2,6 +2,8 @@
 #include <iostream>
 #include <regex>
 #include "DICIONARIO.h"
+#include "my_utils.cpp"
+
 using namespace std;
 
 class tabela_simbolos{
@@ -54,12 +56,13 @@ public:
   }//fim construtor
 
 
-  int eh_palavra_reservada(string string){
+  int eh_palavra_reservada(string str){
 
     for (auto it = symbols.cbegin(); it != symbols.cend(); ++it)
-        if(string == (*it).first) return (*it).second;
+        if(str.compare((*it).first) == 0) return (*it).second;
 
     return T_NEW_ID;
+
 
   }// fim eh_palavra_reservada
 

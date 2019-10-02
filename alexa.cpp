@@ -1,197 +1,322 @@
 #include "symbols.cpp"
 #include "DICIONARIO.h"
-#include <regex>
 #include <string>
 #include <fstream>
 #include <iostream>
+#include <vector>
+#include <ctype.h>
+
 
 using namespace std;
 
-extern tabela_simbolos table;
+class Analisador_Lexico{
 
-int number(ifstream &src, string lexema) {
-    char c;
-    src >> noskipws >> c;
+    private:
 
-    if (regex_match(lexema, regex("(0)")) && c == 'h') {
-        lexema.append(&c);
-        src >> noskipws >> c;
-        if (!regex_match(&c, regex("[0-9a-fA-F]"))) return 0;
-        lexema.append(&c);
-        src >> noskipws >> c;
-        if (!regex_match(&c, regex("[0-9a-fA-F]"))) return 0;
-        lexema.append(&c);
-        return T_VALUE;
-    }
+        vector <char> letras{'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z',
+							 'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','X','W','Y','Z' };
+		vector <char> digitos{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+		vector <char> hexa{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'A', 'B', 'C', 'D', 'E', 'F'};
+		vector <char> permitidos{ 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z',
+                                  'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','X','W','Y','Z',
+								  '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+								  '.', ',', ':', '[', ']', '+', '-', '*', '/', ';', '"', '\'', ' ', '\n', '\r', '\t', '>', '<', '=', '{', '}', '!', '&', '(', ')', '?', '_'};
+		tabela_simbolos table;
 
-    while(regex_match(&c, regex("\d"))) {
-        lexema.append(&c);
-        src >> noskipws >> c;
-    }
-    src.seekg(-1, ios::cur); // devolve c
-    return T_VALUE;
-}
+		void return_C() {
+            if (!this->entrada.eof())
+			    this->entrada.seekg(-1, ios::cur);
+			
+		}//fim return_C
 
-int words(ifstream &src, string lexema){
-    char c;
-    src >> noskipws >> c;
-    while (regex_match(&c, regex("(\w|\d|_)"))) {
-        lexema.append(&c);
-        src >> noskipws >> c;
-    }
-    
-    int token = table.eh_palavra_reservada(lexema);
-    if (token == 101) {
-        table.add_id(lexema);
-    }
-    src.seekg(-1, ios::cur);
-    return token;
-}
+		bool pertence(vector<char> v, char c) {
 
-int equals(ifstream & src, string lexema) {
-    char c;
-    src >> noskipws >> c;
-    if (c == '=') {
-        lexema.append(&c);
-        return T_EQUALS;
-    }
-    src.seekg(-1, ios::cur);
-    return T_ATRIBUICAO;
-}
+			bool awnser = false;
 
-int greater_than(ifstream &src, string lexema) {
-    char c;
-    src >> noskipws >> c;
-    if (c == '=') {
-        lexema.append(&c);
-        return T_GREATER_THAN_EQUAL;
-    }
-    src.seekg(-1, ios::cur);
-    return T_GREATER_THAN;
-}
+			if (find(v.begin(), v.end(), c) != v.end()) awnser = true;
 
-int lesser_than(ifstream &src, string lexema) {
-    char c;
-    src >> noskipws >> c;
-    if (c == '=') {
-        lexema.append(&c);
-        return T_LESSER_THAN_EQUAL;
-    }
-    src.seekg(-1, ios::cur);
-    return T_LESSER_THAN;
-}
+			return awnser;	
+		
+		}//fim pertence
+       
 
-int not_equal(ifstream &src, string lexema) {
-    char c;
-    src >> noskipws >> c;
-    if (c == '=') {
-        lexema.append(&c);
-        return T_NOT_EQUAL;
-    }
-    return LEX_ERROR;
-}
+    public:
 
-void comments(ifstream &src, int &line) {
-    char c;
-    src >> noskipws >> c;
-    while(true) {
-        if (c == '\n') line++;
-        if (c == '*') {
-            src >> noskipws >> c;
-            if (c == '/') break;
+		int line;
+		ifstream entrada;
+
+		Analisador_Lexico() {
+		
+			this->entrada.open("exemplo1.txt");
+			this->line = 1;
+
+		}//fim construtor
+
+		Analisador_Lexico(string entrada_nome) {
+
+			this->entrada.open(entrada_nome);
+			this->line = 1;
+
+		}//fim construtor
+
+        int number(string lexema) {
+            char c;
+            entrada >> noskipws >> c;
+
+            // cout << "if" << endl;
+            if (!lexema.compare("0") && c == 'h') {
+                // cout << "\t hexa" << endl;
+                lexema.append(1, c);
+                entrada >> noskipws >> c;
+                
+                if (!pertence(hexa, c) || entrada.eof()) return LEX_ERROR;
+                lexema.append(1, c);
+                entrada >> noskipws >> c;
+                if (!pertence(hexa, c) || entrada.eof()) return 0;
+                lexema.append(1, c);
+                return T_VALUE;
+
+            }//fim if
+            // cout << "number" << endl;
+            while(pertence(digitos, c) && !entrada.eof()) {
+                lexema.append(1, c);
+                entrada >> noskipws >> c;
+                // cout << '\t' << lexema << endl;
+            }//fim while
+
+            // cout << c<< endl;
+            // cout << lexema << endl;
+            return_C(); 
+            // cout << c<< endl;
+            // cout << lexema << endl;
+            return T_VALUE;
+
+        }//fim number
+
+        int strings(string lexema) {
+            char c;
+            bool continua = true;
+            do {
+                entrada >> noskipws >> c;
+                if (c == '\'' && !entrada.eof()) { 
+                    lexema.append(1, c);
+                    entrada >> noskipws >> c;
+                     // if(!pertence(permitidos, c)) return LEX_ERROR;
+                    if (entrada.eof()) continua = false;
+                    else if (c != '\'' && !entrada.eof()) {
+                        // cout << c << endl;
+                        continua = false;
+                    }
+                    else lexema.append(1, c);
+                }
+                else if (c == '\n' && !entrada.eof()) return LEX_ERROR;
+                else if (pertence(permitidos, c) && !entrada.eof()) lexema.append(1, c);
+                else return LEX_ERROR;
+                // cout << lexema << endl;
+            } while (continua);
+
+            // cout << lexema << endl;
+            return_C();
+            return T_STRING_LITERAL;
         }
-        src >> noskipws >> c;
-    }
-}
 
-int start(ifstream &src, int &line) {
-    string lexema;
-    lexema = "";
-    int token;
+        int words(string lexema){
+            char c;
+            entrada >> noskipws >> c;
+            // cout << c << endl;
+            while ((pertence(letras, c) || pertence(digitos,c) ||  c == '_') && !entrada.eof()) {
+                lexema.append(1, c);
+                entrada >> noskipws >> c;
+                // cout << c << endl;
+                // cout << "\t" << lexema << endl;
+            }//fim while
+            
+            int token = table.eh_palavra_reservada(lexema);
+            if (token == 101) {
+				token = T_ID;
+                table.add_id(lexema);
+            }//fim if
+            return_C();
+            // cout << c << endl;
+            // cout << lexema << endl;
 
-    char c;
-    src >> noskipws >> c;
-    while (c == ' ' || c == '\n' || c == '\t') {
-        if (c == '\n') line++;
-        if (c == '/') { // comentario ou divisao
-            src >> noskipws >> c;
-            if (c == '*') {
-                comments(src, line);
+            return token;
+        }//fim words()
+
+        int equals(string lexema) {
+            char c;
+            entrada >> noskipws >> c;
+            if (c == '=' && !entrada.eof()) {
+                lexema.append(1, c);
+                return T_EQUALS;
             }
-            else return T_DIVIDE; // divisão
+            return_C();
+            return T_ATRIBUICAO;
         }
-        src >> noskipws >> c;
-    }
-    if (regex_match(&c, regex("\d"))) {
-        lexema.append(&c);
-        token = number(src, lexema);
-    }
-    else if (regex_match(&c, regex("\w"))) {
-        lexema.append(&c);
-        token = words(src, lexema);
-    }
-    else if (c == '_') {
-        lexema.append(&c);
-        src >> noskipws >> c;
-        while (c == '_') {
-            lexema.append(&c);
-            src >> noskipws >> c;
-        }
-        if (regex_match(&c, regex("\d|\w"))){
-            lexema.append(&c);
-            token = words(src, lexema);
-        }
-        else return LEX_ERROR;
-    }
-    else if (c == '=') {
-        lexema.append(&c);
-        token = equals(src, lexema);
 
-    } 
-    else if (regex_match(&c, regex("(<|>|!)"))) {
-        lexema.append(&c);
-        switch (c) {
-            case '>':
-                token = greater_than(src, lexema);
-                break;
-            case '<':
-                token = lesser_than(src, lexema);
-                break;
-            case '!':
-                token = not_equal(src, lexema);
-                break;
-            default:
-                token = LEX_ERROR;
-                break;
+        int greater_than(string lexema) {
+            char c;
+            entrada >> noskipws >> c;
+            if (c == '=' && !entrada.eof()) {
+                lexema.append(1, c);
+                return T_GREATER_THAN_EQUAL;
+            }
+            return_C();
+            return T_GREATER_THAN;
         }
-    }
-    else {
-        switch (c) {
-            case '(':
-                token = T_OPEN_PARENTESIS;
-                break;
-            case ')':
-                token = T_CLOSE_PARENTESIS;
-                break;
-            case ',':
-                token = T_COMMA;
-                break;
-            case ';':
-                token = T_SEMICOLON;
-                break;
-            case '+':
-                token = T_ADD;
-                break;
-            case '-':
-                token = T_SUBTRACT;
-                break;
-            case '*':
-                token = T_MULTIPLY;
-                break;
-            default:
-                token = LEX_ERROR;
-                break;
+
+        int lesser_than(string lexema) {
+            char c;
+            entrada >> noskipws >> c;
+            if (c == '=' && !entrada.eof()) {
+                lexema.append(1, c);
+                return T_LESSER_THAN_EQUAL;
+            }
+            return_C();
+            return T_LESSER_THAN;
         }
-    }
-    return token;
-}
+
+        int not_equal(string lexema) {
+            char c;
+            entrada >> noskipws >> c;
+            if (c == '=' && !entrada.eof()) {
+                lexema.append(1, c);
+                return T_NOT_EQUAL;
+            }
+            return LEX_ERROR;
+        }
+
+        int comments() {
+            char c;
+            entrada >> noskipws >> c;
+            while(pertence(permitidos, c)  && !entrada.eof()) {
+                // cout << c;
+                if (c == '\n') line++;
+                while (c == '*') {
+                    entrada >> noskipws >> c;
+                    // cout << c;
+                    if (c == '/') return 0; //terminou o comentário
+                }//fim if
+                entrada >> noskipws >> c;
+            }//fim while
+			return LEX_ERROR; //se tiver algum caractere não permitido
+        }//fim comments()
+
+        int start() {
+            // cout << "Alexa Start!" << endl;
+            string lexema;
+            lexema = "";
+            int token;
+
+            char c;
+            entrada >> noskipws >> c;
+            // cout << c << endl;
+            while ((isspace(c) || c == '\n' || c == '\t' || c == '/') && !entrada.eof()) {
+
+                // cout << c;
+                if (c == '\n') line++;
+                if (c == '/') { // comentario ou divisao
+                    entrada >> noskipws >> c;
+                    // cout << c;
+                    if (c == '*') {
+                        if (comments() != 0) return LEX_ERROR;
+                    }//fim if
+					
+					else {
+                        // cout << "divide" << endl;
+						return_C();
+						return T_DIVIDE;
+
+					}  // divisão
+
+                }//fim if
+
+                entrada >> noskipws >> c;
+                // cout << c << endl;
+
+            }//fim while
+            // cout << "sai while"<< endl;
+            // cout << c << endl;
+            if (pertence(digitos, c)) {
+                // cout << "numbers" << endl;
+                lexema.append(1, c);
+                token = number(lexema);
+            }//if
+            else if (pertence(letras, c)) {
+                // cout << "words" << endl;                
+                lexema.append(1, c);
+                // cout << lexema << endl;
+                token = words(lexema);
+            }
+            else if (c == '_') {
+                lexema.append(1, c);
+                entrada >> noskipws >> c;
+                while (c == '_' && !entrada.eof()) {
+                    lexema.append(1, c);
+                    entrada >> noskipws >> c;
+                }//fim while
+                if ((pertence(letras, c) || pertence(digitos, c)) && !entrada.eof()){
+                    lexema.append(1, c);
+                    token = words(lexema);
+                }
+                else return LEX_ERROR;
+            }
+            else if (c == '='  && !entrada.eof()) {
+                lexema.append(1, c);
+                token = equals(lexema);
+
+            } 
+            else if (c == '\'' && !entrada.eof()) {
+                lexema.append(1, c);
+                token = strings(lexema);
+            }
+            else if ((c == '<' || c == '>' || c == '!') && !entrada.eof()) {
+                lexema.append(1, c);
+                switch (c) {
+                    case '>':
+                        token = greater_than(lexema);
+                        break;
+                    case '<':
+                        token = lesser_than(lexema);
+                        break;
+                    case '!':
+                        token = not_equal(lexema);
+                        break;
+                    default:
+                        token = LEX_ERROR;
+                        break;
+                }
+            }
+            else {
+                switch (c) {
+                    case '(':
+                        token = T_OPEN_PARENTESIS;
+                        break;
+                    case ')':
+                        token = T_CLOSE_PARENTESIS;
+                        break;
+                    case ',':
+                        token = T_COMMA;
+                        break;
+                    case ';':
+                        token = T_SEMICOLON;
+                        break;
+                    case '+':
+                        token = T_ADD;
+                        break;
+                    case '-':
+                        token = T_SUBTRACT;
+                        break;
+                    case '*':
+                        token = T_MULTIPLY;
+                        break;
+                    default:
+                        token = LEX_ERROR;
+                        break;
+                }
+            }
+            // cout << c << endl;
+            return token;
+        }
+
+};//fim classe
