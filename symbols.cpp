@@ -2,14 +2,13 @@
 #include <iostream>
 #include <regex>
 #include "DICIONARIO.h"
-#include "my_utils.cpp"
-
 using namespace std;
 
 class tabela_simbolos{
 
 private:
   unordered_map<string, int> symbols;
+  unordered_map<string, string> constantes;
   int posicao;
 
 public:
@@ -48,7 +47,9 @@ public:
     this->symbols["main"]=32;
     this->symbols["boolean"]=33;
     this->symbols["true"]=34;
+	this->constantes["true"] = "boolean";
     this->symbols["false"]=34;
+	this->constantes["false"] = "boolean";
     this->symbols["id"]=35;
 
     this->posicao = 36;
@@ -56,10 +57,10 @@ public:
   }//fim construtor
 
 
-  int eh_palavra_reservada(string str){
+  int eh_palavra_reservada(string string){
 
     for (auto it = symbols.cbegin(); it != symbols.cend(); ++it)
-        if(str.compare((*it).first) == 0) return (*it).second;
+        if(string == (*it).first) return (*it).second;
 
     return T_NEW_ID;
 
@@ -75,12 +76,14 @@ public:
   void add_valor(string valor){
 
     this->symbols[valor] = 34;
+	this->constantes[valor] = "integer";
 
   }//fim add_valor
 
   void add_string(string string){
 
     this->symbols[string] = 34;
+	this->constantes[string] = "string";
 
   }//fim add_string
 
@@ -88,6 +91,8 @@ public:
       //debbug
       for (auto it = symbols.cbegin(); it != symbols.cend(); ++it)
         cout << " [" << (*it).first << ':' << (*it).second << ']' << endl;
+	  for (auto it = constantes.cbegin(); it != constantes.cend(); ++it)
+		  cout << " [" << (*it).first << ':' << (*it).second << ']' << endl;
 
     }//fim print_tabela
 
@@ -95,8 +100,8 @@ public:
 
 };//fim classe tabela_simbolos
 
-// int main(){
-
+//int main(){
+//
 //   /*map<string, int> m;
 //   m["hello"] = 23;
 //   // check if key is present
@@ -109,15 +114,11 @@ public:
 //   cout << "Key: " << i->first << " Value: " << i->second << '\n';
 //   return 0;
 //   */
-//   tabela_simbolos symbols;//instancia da tabela_simbolos
-//   symbols.add_id("mago");
-//   symbols.add_valor("42");
-//   symbols.add_string("estudante");
-//   symbols.add_string("esferico");
-//   symbols.print_tabela();
+//tabela_simbolos symbols;
+//symbols.add_tipo("42");//instancia da tabela_simbolos
+ //   symbols.print_tabela();
 //   bool r = symbols.eh_palavra_reservada("while");
 //   cout << r << endl;
 //   r = symbols.eh_palavra_reservada("hu3");
 //   cout << r << endl;
-
-// }//fim main()
+//}//fim main()

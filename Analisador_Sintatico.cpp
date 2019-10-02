@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include "alexa.cpp"
 #include "DICIONARIO.h"
-
+//#include "alexa.cpp"
 using namespace std;
 
 //DEFININDO FUNCOES
@@ -20,16 +20,30 @@ void procedimento_E();
 void procedimento_E1();
 void procedimento_E2();
 void procedimento_E3();
-void procedimento_F();
+
+void Init(char* arq);
 
 int tok;
+Analisador_Lexico alexa("teste.l");
 //static int present_line = 1;
 //static 
 
+void Init(char* nome) {
+	char c;
+	ifstream arq(nome);
+	ofstream file("temp.l", ios_base::binary | ios_base::out);
+	do {
+		arq >> noskipws >> c;
+		file << c;
+	} while(!arq.eof());
+	arq.close();
+	file.close();
+	alexa.open("temp.l");
+}
 
 void procedimento_S(){
 
-	while (tok == T_INTEGER || tok == T_BOOLEAN || tok == T_BYTE || tok == T_STRING || tok == T_CONST) {
+	while (tok == T_INTEGER || tok == T_BOOLEAN || tok == T_BYTE || tok == T_STRING ||  tok == T_CONST) {
 	
 		procedimento_D();
 		marry_token(T_SEMICOLON);
@@ -42,7 +56,7 @@ void procedimento_S(){
 
 		procedimento_C();
 	
-	} while (tok == T_READLN || tok == T_WRITE || tok == T_WRITELN || tok == T_WHILE || tok == T_IF || tok == T_SEMICOLON); //fim do.while
+	} while (tok == T_READLN || tok == T_WRITE || tok == T_WRITELN || tok == T_WHILE || tok == T_IF || tok == T_ID || tok == T_SEMICOLON); //fim do.while
 
 	marry_token(T_END);
 
@@ -52,6 +66,7 @@ void procedimento_C() {
 
 	if (tok == T_READLN) {
 
+		marry_token(T_READLN);
 		marry_token(T_OPEN_PARENTESIS);
 		marry_token(T_ID);
 		marry_token(T_CLOSE_PARENTESIS);
@@ -60,18 +75,49 @@ void procedimento_C() {
 	
 	}//fim if
 
-	else if (tok == T_WRITE || tok == T_WRITELN) {
+	else if (tok == T_WRITE) {
 
+		marry_token(T_WRITE);
 		marry_token(T_OPEN_PARENTESIS);
-		procedimento_F();
+
+		procedimento_E();
+
+		while (tok == T_COMMA) {
+
+			marry_token(T_COMMA);
+			procedimento_E();
+
+		}//fim while
+
 		marry_token(T_CLOSE_PARENTESIS);
 		marry_token(T_SEMICOLON);
 
 	
 	}//fim if
 
+	else if (tok == T_WRITELN) {
+
+		marry_token(T_WRITELN);
+		marry_token(T_OPEN_PARENTESIS);
+
+		procedimento_E();
+
+		while (tok == T_COMMA) {
+
+			marry_token(T_COMMA);
+			procedimento_E();
+
+		}//fim while
+
+		marry_token(T_CLOSE_PARENTESIS);
+		marry_token(T_SEMICOLON);
+
+
+	}//fim if
+
 	else if (tok == T_WHILE) {
 
+		marry_token(T_WHILE);
 		marry_token(T_OPEN_PARENTESIS);
 		procedimento_E();
 		marry_token(T_CLOSE_PARENTESIS);
@@ -79,7 +125,7 @@ void procedimento_C() {
 
 			marry_token(T_BEGIN);
 
-			while (tok == T_READLN || tok == T_WRITE || tok == T_WRITELN || tok == T_WHILE || tok == T_IF || tok == T_SEMICOLON) {
+			while (tok == T_READLN || tok == T_WRITE || tok == T_WRITELN || tok == T_WHILE || tok == T_IF || tok == T_ID || tok == T_SEMICOLON) {
 			
 				procedimento_C();
 
@@ -97,8 +143,9 @@ void procedimento_C() {
 	
 	}//fim if
 
-	else if (T_IF) {
+	else if (tok == T_IF) {
 
+		marry_token(T_IF);
 		marry_token(T_OPEN_PARENTESIS);
 		procedimento_E();
 		marry_token(T_CLOSE_PARENTESIS);
@@ -108,7 +155,7 @@ void procedimento_C() {
 
 			marry_token(T_BEGIN);
 
-			while (tok == T_READLN || tok == T_WRITE || tok == T_WRITELN || tok == T_WHILE || tok == T_IF || tok == T_SEMICOLON) {
+			while (tok == T_READLN || tok == T_WRITE || tok == T_WRITELN || tok == T_WHILE || tok == T_IF || tok == T_ID || tok == T_SEMICOLON) {
 
 				procedimento_C();
 
@@ -130,15 +177,15 @@ void procedimento_C() {
 	
 			if (tok == T_BEGIN) {
 
-			marry_token(T_BEGIN);
+				marry_token(T_BEGIN);
 
-			while (tok == T_READLN || tok == T_WRITE || tok == T_WRITELN || tok == T_WHILE || tok == T_IF || tok == T_SEMICOLON) {
+				while (tok == T_READLN || tok == T_WRITE || tok == T_WRITELN || tok == T_WHILE || tok == T_IF || tok == T_ID || tok == T_SEMICOLON) {
 			
-				procedimento_C();
+					procedimento_C();
 
-			}//fim shile
+				}//fim shile
 
-			marry_token(T_END);
+				marry_token(T_END);
 		
 			}//fim if
 
@@ -152,8 +199,17 @@ void procedimento_C() {
 	
 	}//fim else if
 
-	else {
+	else if (tok == T_ID) {
 
+		marry_token(T_ID);
+		marry_token(T_ATRIBUICAO);
+		procedimento_E();
+		marry_token(T_SEMICOLON);
+
+	}//fim if
+
+	else {
+		
 		marry_token(T_SEMICOLON);
 
 	}//fim else
@@ -200,7 +256,12 @@ void procedimento_D() {
 	
 		marry_token(T_CONST);
 		marry_token(T_ID);
-		marry_token(T_EQUALS);
+		marry_token(T_ATRIBUICAO);
+		if (tok == T_SUBTRACT) {
+
+			marry_token(T_SUBTRACT);
+
+		}//fim if
 		marry_token(T_VALUE);
 
 	}//fim else
@@ -400,35 +461,25 @@ void procedimento_E3() {
 
 }//fim E3
 
-void procedimento_F() {
-
-	procedimento_E();
-
-	while (tok == T_COMMA) {
-
-		marry_token(T_COMMA);
-		procedimento_E();
-
-	}//fim while
-
-}//fim F
-
 int marry_token(int expected_token){
+
+	cout << "token esperado: " << expected_token << "	token: " << tok << endl; //DEBBUG
 
 	if (tok != expected_token) {
 	
-		cout << "TOKEN NÃO ESPERADO" << endl;
+		cout << alexa.line  << ": TOKEN NAO ESPERADO" << endl;
 		exit(0);
 
 	}//fim if
 
-	return 1;// start(entrada, present_line);
+	tok = alexa.start();
 
 }//fim marry_token
 
-int main(){
 
-	Analisador_Lexico alexa("exemplo1.txt");
+int main(int argc, char* args[]){
+
+	Init(args[1]);
 
 	tok = alexa.start();
 	procedimento_S();
@@ -436,9 +487,11 @@ int main(){
 	if (!alexa.entrada.eof()) {
 
 		cout << "FINAL DE ARQUIVO ESPERADO" << endl;
+		alexa.close();
 		return 1;
 	
 	}//fim if
     
+	alexa.close();
 
 }//fim main

@@ -22,7 +22,7 @@ class Analisador_Lexico{
 								  '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
 								  '.', ',', ':', '[', ']', '+', '-', '*', '/', ';', '"', '\'', ' ', '\n', '\r', '\t', '>', '<', '=', '{', '}', '!', '&', '(', ')', '?', '_'};
 		tabela_simbolos table;
-
+        char* file_name;
 		void return_C() {
             if (!this->entrada.eof())
 			    this->entrada.seekg(-1, ios::cur);
@@ -47,17 +47,28 @@ class Analisador_Lexico{
 
 		Analisador_Lexico() {
 		
-			this->entrada.open("exemplo1.txt");
+            this->entrada.open("exemplo1.txt");
 			this->line = 1;
 
 		}//fim construtor
 
-		Analisador_Lexico(string entrada_nome) {
-
+		Analisador_Lexico(char* entrada_nome) {
+            this->file_name = entrada_nome;
 			this->entrada.open(entrada_nome);
 			this->line = 1;
 
 		}//fim construtor
+
+        void open(char* arq){
+            this->entrada.close();
+            this->entrada.open(arq);
+            this->file_name = arq;
+        }
+        
+        void close() {
+            this->entrada.close();
+            remove(this->file_name);
+        }
 
         int number(string lexema) {
             char c;
@@ -94,12 +105,14 @@ class Analisador_Lexico{
         }//fim number
 
         int strings(string lexema) {
+            int size = 0;
             char c;
             bool continua = true;
             do {
                 entrada >> noskipws >> c;
                 if (c == '\'' && !entrada.eof()) { 
                     lexema.append(1, c);
+                    size++;
                     entrada >> noskipws >> c;
                      // if(!pertence(permitidos, c)) return LEX_ERROR;
                     if (entrada.eof()) continua = false;
@@ -107,13 +120,21 @@ class Analisador_Lexico{
                         // cout << c << endl;
                         continua = false;
                     }
-                    else lexema.append(1, c);
+                    else {
+                        lexema.append(1, c);
+                        size++;
+                    }
                 }
                 else if (c == '\n' && !entrada.eof()) return LEX_ERROR;
-                else if (pertence(permitidos, c) && !entrada.eof()) lexema.append(1, c);
+                else if (pertence(permitidos, c) && !entrada.eof()) {
+                    lexema.append(1, c);
+                    size++;
+                }
                 else return LEX_ERROR;
                 // cout << lexema << endl;
-            } while (continua);
+            } while (continua && size <= 255);
+
+            if (size > 255) return LEX_ERROR;
 
             // cout << lexema << endl;
             return_C();
@@ -199,6 +220,7 @@ class Analisador_Lexico{
                 }//fim if
                 entrada >> noskipws >> c;
             }//fim while
+            if (entrada.eof()) return UNEXPECTED_EOF;
 			return LEX_ERROR; //se tiver algum caractere não permitido
         }//fim comments()
 
@@ -235,6 +257,8 @@ class Analisador_Lexico{
                 // cout << c << endl;
 
             }//fim while
+
+            if (entrada.eof()) return EOF_NO_LEX;
             // cout << "sai while"<< endl;
             // cout << c << endl;
             if (pertence(digitos, c)) {

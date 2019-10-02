@@ -1,7 +1,7 @@
-// using namespace std;
+using namespace std;
 
-// template<typename T>
+template<typename T>
 
-// void print(T str) {
-// 	cout << str << endl;
-// }
+void print(T str) {
+	cout << str << endl;
+}
