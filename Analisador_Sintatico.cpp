@@ -463,11 +463,14 @@ void procedimento_E3() {
 
 int marry_token(int expected_token){
 
-	cout << "token esperado: " << expected_token << "	token: " << tok << endl; //DEBBUG
+	// cout << "token esperado: " << expected_token << "	token: " << tok << endl; //DEBBUG
 
 	if (tok != expected_token) {
-	
-		cout << alexa.line  << ": TOKEN NAO ESPERADO" << endl;
+		string msg = "TOKEN NAO ESPERADO";
+		if (tok == LEX_ERROR) msg = "LEXEMA INVALIDO";
+		if (tok == UNEXPECTED_EOF) msg = "EOF NAO ESPERADO";
+		if (tok == INVALID_CHAR) msg = "CARACTERE INVALIDO"; 
+		cout << "linha " << alexa.line  << ": "<< msg << " [" << tok << "]" << endl;
 		exit(0);
 
 	}//fim if

@@ -39,6 +39,7 @@
 
 #define T_NEW_ID 101
 
-#define LEX_ERROR 500
+#define INVALID_CHAR 503
+#define UNEXPECTED_EOF 502
 #define EOF_NO_LEX 501
-#define UNEXPECTED_EOF 496
+#define LEX_ERROR 500
