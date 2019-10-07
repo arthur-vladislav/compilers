@@ -85,11 +85,7 @@ class Analisador_Lexico{
                 lexema.append(1, c);
                 entrada >> noskipws >> c;
                 if (!pertence(permitidos, c)) return INVALID_CHAR;
-                if (entrada.eof()) return EOF_NO_LEX;
-                if (!pertence(hexa, c)) {
-                    return_C();
-                    return T_VALUE;
-                }
+                if (!pertence(hexa, c) || entrada.eof()) return LEX_ERROR;
                 lexema.append(1, c);
                 return T_VALUE;
 
