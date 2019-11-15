@@ -1,6 +1,5 @@
 #include <unordered_map>
 #include <iostream>
-#include <regex>
 #include "DICIONARIO.h"
 using namespace std;
 
@@ -47,9 +46,9 @@ public:
     this->symbols["main"]=32;
     this->symbols["boolean"]=33;
     this->symbols["true"]=34;
-	this->constantes["true"] = "boolean";
+	  this->constantes["true"] = "boolean";
     this->symbols["false"]=34;
-	this->constantes["false"] = "boolean";
+	  this->constantes["false"] = "boolean";
     this->symbols["id"]=35;
 
     this->posicao = 36;
@@ -63,11 +62,9 @@ public:
         if(string == (*it).first) return (*it).second;
 
     return T_NEW_ID;
-
-
   }// fim eh_palavra_reservada
 
-  void add_id(string id){
+  void add_id(string id) {
 
     this->symbols[id] = 35;
 

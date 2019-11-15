@@ -271,9 +271,9 @@ void procedimento_D() {
 
 void procedimento_D1() {
 
-	if (tok == T_EQUALS) {
+	if (tok == T_ATRIBUICAO) {
 	
-		marry_token(T_EQUALS);
+		marry_token(T_ATRIBUICAO);
 		procedimento_E();
 		procedimento_D2();
 
@@ -294,9 +294,9 @@ void procedimento_D2() {
 
 		marry_token(T_COMMA);
 		marry_token(T_ID);
-		if (tok == T_EQUALS) {
+		if (tok == T_ATRIBUICAO) {
 		
-			marry_token(T_EQUALS);
+			marry_token(T_ATRIBUICAO);
 			procedimento_E();
 
 		}//fim if
