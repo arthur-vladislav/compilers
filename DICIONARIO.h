@@ -43,3 +43,11 @@
 #define UNEXPECTED_EOF 502
 #define EOF_NO_LEX 501
 #define LEX_ERROR 500
+
+
+//tipo tabela simbolo
+#define NO_TYPE 0
+#define TYPE_INTEGER 1
+#define TYPE_STRING 2
+#define TYPE_BOOLEAN 3
+#define TYPE_BYTE 4
