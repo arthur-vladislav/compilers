@@ -202,7 +202,7 @@ void procedimento_C() {
 	else if (tok == T_ID) {
 
 		marry_token(T_ID);
-		marry_token(T_ATRIBUICAO);
+		marry_token(T_ASSIGN);
 		procedimento_E();
 		marry_token(T_SEMICOLON);
 
@@ -256,7 +256,7 @@ void procedimento_D() {
 	
 		marry_token(T_CONST);
 		marry_token(T_ID);
-		marry_token(T_ATRIBUICAO);
+		marry_token(T_ASSIGN);
 		if (tok == T_SUBTRACT) {
 
 			marry_token(T_SUBTRACT);
@@ -271,9 +271,9 @@ void procedimento_D() {
 
 void procedimento_D1() {
 
-	if (tok == T_ATRIBUICAO) {
+	if (tok == T_ASSIGN) {
 	
-		marry_token(T_ATRIBUICAO);
+		marry_token(T_ASSIGN);
 		procedimento_E();
 		procedimento_D2();
 
@@ -294,9 +294,9 @@ void procedimento_D2() {
 
 		marry_token(T_COMMA);
 		marry_token(T_ID);
-		if (tok == T_ATRIBUICAO) {
+		if (tok == T_ASSIGN) {
 		
-			marry_token(T_ATRIBUICAO);
+			marry_token(T_ASSIGN);
 			procedimento_E();
 
 		}//fim if

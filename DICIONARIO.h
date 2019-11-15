@@ -8,7 +8,7 @@
 #define T_AND 8
 #define T_OR 9
 #define T_NOT 10
-#define T_ATRIBUICAO 11
+#define T_ASSIGN 11
 #define T_EQUALS 12
 #define T_OPEN_PARENTESIS 13
 #define T_CLOSE_PARENTESIS 14

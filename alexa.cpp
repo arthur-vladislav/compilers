@@ -185,7 +185,7 @@ class Analisador_Lexico{
                 return T_EQUALS;
             }
             return_C();
-            return T_ATRIBUICAO;
+            return T_ASSIGN;
         }
 
         int greater_than(string lexema) {
