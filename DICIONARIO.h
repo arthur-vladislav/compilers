@@ -8,7 +8,7 @@
 #define T_AND 8
 #define T_OR 9
 #define T_NOT 10
-#define T_ASSIGN 11
+#define T_ATRIBUICAO 11
 #define T_EQUALS 12
 #define T_OPEN_PARENTESIS 13
 #define T_CLOSE_PARENTESIS 14
@@ -38,8 +38,13 @@
 #define T_ID 35
 
 #define T_NEW_ID 101
-
-#define INVALID_CHAR 503
-#define UNEXPECTED_EOF 502
-#define EOF_NO_LEX 501
 #define LEX_ERROR 500
+#define UNEXPECTED_EOF 502
+
+
+//tipo tabela simbolo
+#define NO_TYPE 0
+#define TYPE_INTEGER 1
+#define TYPE_STRING 2
+#define TYPE_BOOLEAN 3
+#define TYPE_BYTE 4
