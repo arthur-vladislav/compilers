@@ -55,31 +55,47 @@ Gramática Linguagem L
 
 <sup>a</sup>: se id.classe != vazio então ERRO // unicidade 
 senão id.classe = classe-const  // declaração
+
 <sup>b</sup>: se id.classe != vazio então ERRO // unicidade 
 senão id.classe = classe-var  // declaração
+
 <sup>c</sup>: se id.classe = vazio então ERRO
+
 <sup>d</sup>: E.tipo = E1.1.tipo
+
 <sup>e</sup>: pegar operador  // pegar operador para comparação
+
 <sup>f</sup>: se E1.1.tipo != E1.2.tipo então ERRO // tipos incompatíveis
-<sup>g</sup>: se operador == ‘=’ então
-se E1.1.tipo == string AND E1.2.tipo == string OU E1.1.tipo == inteiro AND E1.2.tipo == inteiro então OK
+
+<sup>g</sup>: se operador == ‘==’ OU `!=` então
+se E1.1.tipo == string AND E1.2.tipo == string OU E1.1.tipo == inteiro AND E1.2.tipo == inteiro OU E1.1.tipo == bool AND E1.2.yipo == boolentão OK
           senão ERRO
         senão
   se E1.1.tipo != inteiro AND E1.2.tipo != inteiro então ERRO
+
 <sup>h</sup>: E1.tipo = E2.1.tipo  // E’ recebe E’’
+
 <sup>i</sup>: se E2.1.tipo != E2.2.tipo então ERRO  // tipos incompatíveis
+
 <sup>j</sup>: se operador == or então
   Se E2.1.tipo != inteiro AND E2.1.tipo != string então ERRO
         senão
   se E1.1.tipo != inteiro AND E1.2.tipo != inteiro então ERRO 
+
 <sup>k</sup>: E1.tipo = E3.tipo  // E’ recebe E’’
+
 <sup>l</sup>: se E3.1.tipo != E3.2.tipo então ERRO  // tipos incompatíveis
+
 <sup>m</sup>: se operador == and então
   Se E2.1.tipo != inteiro AND E2.1.tipo != string então ERRO
         senão
   se E1.1.tipo != inteiro AND E1.2.tipo != inteiro então ERRO 
+
 <sup>n</sup>: E3.tipo = E.tipo
+
 <sup>o</sup>: se E3.1.tipo = string então ERRO 
 senão E3.tipo = E3.1.tipo 
+
 <sup>p</sup>:  E3.tipo = VALORCONST.tipo
+
 <sup>q</sup>:  E3.tipo = id.tipo

@@ -6,7 +6,7 @@ Gramática Linguagem L
 - C ->   
   - “readln” “(“ id “)” “;”<sup>2</sup> | 
   - “write” “(” E<sup>1</sup> {“,” E<sup>1</sup>}“)” “;” | 
-  - “writeln” “(” E { “,” E } “)” “;”<sup>1.1</sup> | 
+  - “writeln” “(” E<sup>1</sup> { “,” E<sup>1</sup> } “)” “;”<sup>1.1</sup> | 
   - “while” “(” E “)”<sup>3</sup> (C | “begin” {C} “end”) |
   - “if” “(“ E “)”<sup>4</sup> “then” (C | “begin” {C} “end”) [ else”(C | “begin” {C} “end”)] | 
   - id “=” E “;”<sup>5</sup> | “;”       
@@ -16,10 +16,10 @@ Gramática Linguagem L
   - “const” id “=” [“-”] constante_valor 
 
 - D1 ->   
-  - “=” E<sup>7</sup> D2  | D2
+  - “=” E<sup>7</sup> <sup>8</sup>D2  | <sup>8</sup>D2
 
 - D2 ->   
-  - {“,” id [ “=” E ] }
+  - {“,” id<sup>9</sup> [ “=” E<sup>10</sup> ] }
 
 - E ->    
   - E1 [ (“<” | “>” | “!=” | “==” | “>=” | “<=”) E1 ]
@@ -49,6 +49,13 @@ Gramática Linguagem L
 
 <sup>5</sup>: se id.tipo == E.tipo então: {id.val := E.val} senao ERRO
 
-<sup>6</sup>: id.tipo := A.tipo; D1 := A.tipo; se D1.classe != vazio então: id.val := D1.val; D1.tipo = A.tipo
+<sup>6</sup>: id.tipo := A.tipo; D1 := A.tipo; se D1.classe != vazio então: id.val := D1.val; D1.tipo = A.tipo;
 
-<sup>5</sup>: se id.tipo == E.tipo então: {id.val := E.val} senao ERRO
+<sup>7</sup>: se E.tipo != D1.tipo então: ERRO senão D1.val := E.val; 
+
+<sup>8</sup>: D2.tipo = D1.tipo;
+
+<sup>9</sup> id.tipo = A.tipo
+
+<sup>10</sup>:se E.tipo != A.tipo então: ERRO senão id.val := E.val; 
+

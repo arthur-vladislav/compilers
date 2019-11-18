@@ -4,11 +4,29 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
+#include <algorithm>
 #include <ctype.h>
 
 
 using namespace std;
 
+class retorno_lexico{
+    public:
+        string lexema;
+        int TOKEN;
+
+        retorno_lexico(int tok, string lex){
+            TOKEN = tok;
+            lexema = lex;
+        }
+
+        retorno_lexico(){}
+
+        retorno_lexico(int tok){
+            TOKEN = tok;
+            lexema = "";
+        }
+};
 class Analisador_Lexico{
 
     private:
@@ -16,7 +34,7 @@ class Analisador_Lexico{
         vector <char> letras{'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z',
 							 'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','X','W','Y','Z' };
 		vector <char> digitos{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
-		vector <char> hexa{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'A', 'B', 'C', 'D', 'E', 'F'};
+		vector <char> hexa{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'A', 'B', 'C', 'D', 'E', 'F'};
 		vector <char> permitidos{ 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z',
                                   'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','X','W','Y','Z',
 								  '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
@@ -38,7 +56,6 @@ class Analisador_Lexico{
 			return awnser;	
 		
 		}//fim pertence
-       
 
     public:
 
@@ -70,31 +87,31 @@ class Analisador_Lexico{
             remove(this->file_name);
         }
 
-        int number(string lexema) {
+        retorno_lexico number(string lexema) {
             char c;
             entrada >> noskipws >> c;
-            if (!pertence(permitidos, c)) return INVALID_CHAR;
+            if (!pertence(permitidos, c)) return retorno_lexico(INVALID_CHAR);
 
             // cout << "if" << endl;
             if (!lexema.compare("0") && c == 'h') {
                 // cout << "\t hexa" << endl;
                 lexema.append(1, c);
                 entrada >> noskipws >> c;
-                if (!pertence(permitidos, c)) return INVALID_CHAR;
-                if (!pertence(hexa, c) || entrada.eof()) return LEX_ERROR;
+                if (!pertence(permitidos, c)) return retorno_lexico(INVALID_CHAR);
+                if (!pertence(hexa, c) || entrada.eof()) return retorno_lexico(LEX_ERROR);
                 lexema.append(1, c);
                 entrada >> noskipws >> c;
-                if (!pertence(permitidos, c)) return INVALID_CHAR;
-                if (!pertence(hexa, c) || entrada.eof()) return LEX_ERROR;
+                if (!pertence(permitidos, c)) return retorno_lexico(INVALID_CHAR);
+                if (!pertence(hexa, c) || entrada.eof()) return retorno_lexico(LEX_ERROR);
                 lexema.append(1, c);
-                return T_VALUE;
+                return retorno_lexico(T_VALUE, lexema);
 
             }//fim if
             // cout << "number" << endl;
             while(pertence(digitos, c) && !entrada.eof()) {
                 lexema.append(1, c);
                 entrada >> noskipws >> c;
-                if (!pertence(permitidos, c)) return INVALID_CHAR;
+                if (!pertence(permitidos, c)) return retorno_lexico(INVALID_CHAR);
                 // cout << '\t' << lexema << endl;
             }//fim while
 
@@ -103,23 +120,23 @@ class Analisador_Lexico{
             return_C(); 
             // cout << c<< endl;
             // cout << lexema << endl;
-            return T_VALUE;
+            return retorno_lexico(T_VALUE, lexema);
 
         }//fim number
 
-        int strings(string lexema) {
+        retorno_lexico strings(string lexema) {
             int size = 0;
             char c;
             bool continua = true;
             do {
                 entrada >> noskipws >> c;
-                if (!pertence(permitidos, c)) return INVALID_CHAR;
+                if (!pertence(permitidos, c)) return retorno_lexico(INVALID_CHAR);
 
                 if (c == '\'' && !entrada.eof()) { 
                     lexema.append(1, c);
                     size++;
                     entrada >> noskipws >> c;
-                    if (!pertence(permitidos, c)) return INVALID_CHAR;
+                    if (!pertence(permitidos, c)) return retorno_lexico(INVALID_CHAR);
 
                     if (entrada.eof()) continua = false;
                     else if (c != '\'' && !entrada.eof()) {
@@ -133,47 +150,47 @@ class Analisador_Lexico{
                 }
                 else if (c == '\n' && !entrada.eof()) {
                     line++;
-                    return LEX_ERROR;
+                    return retorno_lexico(LEX_ERROR);
                 }
                 else if (pertence(permitidos, c) && !entrada.eof()) {
                     lexema.append(1, c);
                     size++;
                 }
-                else return UNEXPECTED_EOF;
+                else return retorno_lexico(UNEXPECTED_EOF);
                 // cout << lexema << endl;
             } while (continua && size <= 255);
 
-            if (size > 255) return LEX_ERROR;
+            if (size > 255) return retorno_lexico(LEX_ERROR);
 
             // cout << lexema << endl;
             return_C();
-            return T_STRING_LITERAL;
+            return retorno_lexico(T_STRING_LITERAL, lexema);
         }
 
-        int words(string lexema){
+        retorno_lexico words(string lexema){
             char c;
             entrada >> noskipws >> c;
-            if (!pertence(permitidos, c)) return INVALID_CHAR;
+            if (!pertence(permitidos, c)) return retorno_lexico(INVALID_CHAR);
 
             // cout << c << endl;
             while ((pertence(letras, c) || pertence(digitos,c) ||  c == '_') && !entrada.eof()) {
                 lexema.append(1, c);
                 entrada >> noskipws >> c;
-                if (!pertence(permitidos, c)) return INVALID_CHAR;
+                if (!pertence(permitidos, c)) return retorno_lexico(INVALID_CHAR);
                 // cout << c << endl;
                 // cout << "\t" << lexema << endl;
             }//fim while
             
             int token = table.eh_palavra_reservada(lexema);
             if (token == 101) {
-				token = T_ID;
-                table.add_id(lexema);
+				token = T_NEW_ID;
+                table.add_id(lexema, 'b', 0);
             }//fim if
             return_C();
             // cout << c << endl;
             // cout << lexema << endl;
 
-            return token;
+            return retorno_lexico(token, lexema);
         }//fim words()
 
         int equals(string lexema) {
@@ -244,15 +261,15 @@ class Analisador_Lexico{
 			return INVALID_CHAR; //se tiver algum caractere não permitido
         }//fim comments()
 
-        int start() {
+        retorno_lexico start() {
             // cout << "Alexa Start!" << endl;
             string lexema;
             lexema = "";
-            int token;
+            retorno_lexico token;
 
             char c;
             entrada >> noskipws >> c;
-            if (!pertence(permitidos, c)) return INVALID_CHAR;
+            if (!pertence(permitidos, c)) return retorno_lexico(INVALID_CHAR);
             // cout << c << endl;
             while ((isspace(c) || c == '\n' || c == '\t' || c == '/') && !entrada.eof()) {
 
@@ -260,29 +277,29 @@ class Analisador_Lexico{
                 if (c == '\n') line++;
                 if (c == '/') { // comentario ou divisao
                     entrada >> noskipws >> c;
-                    if (!pertence(permitidos, c)) return INVALID_CHAR;
+                    if (!pertence(permitidos, c)) return retorno_lexico(INVALID_CHAR);
                     // cout << c;
                     if (c == '*') {
                         int error = comments();
-                        if (error != 0) return error;
+                        if (error != 0) return retorno_lexico(error);
                     }//fim if
 					
 					else {
                         // cout << "divide" << endl;
 						return_C();
-						return T_DIVIDE;
+						return retorno_lexico(T_DIVIDE);
 
 					}  // divisão
 
                 }//fim if
 
                 entrada >> noskipws >> c;
-                if (!pertence(permitidos, c)) return INVALID_CHAR;
+                if (!pertence(permitidos, c)) return retorno_lexico(INVALID_CHAR);
                 // cout << c << endl;
 
             }//fim while
 
-            if (entrada.eof()) return EOF_NO_LEX;
+            if (entrada.eof()) return retorno_lexico(EOF_NO_LEX);
             // cout << "sai while"<< endl;
             // cout << c << endl;
             if (pertence(digitos, c)) {
@@ -307,11 +324,11 @@ class Analisador_Lexico{
                     lexema.append(1, c);
                     token = words(lexema);
                 }
-                else return LEX_ERROR;
+                else return retorno_lexico(LEX_ERROR);
             }
             else if (c == '='  && !entrada.eof()) {
                 lexema.append(1, c);
-                token = equals(lexema);
+                token = retorno_lexico(equals(lexema));
 
             } 
             else if (c == '\'' && !entrada.eof()) {
@@ -322,44 +339,44 @@ class Analisador_Lexico{
                 lexema.append(1, c);
                 switch (c) {
                     case '>':
-                        token = greater_than(lexema);
+                        token = retorno_lexico(greater_than(lexema));
                         break;
                     case '<':
-                        token = lesser_than(lexema);
+                        token = retorno_lexico(lesser_than(lexema));
                         break;
                     case '!':
-                        token = not_equal(lexema);
+                        token = retorno_lexico(not_equal(lexema));
                         break;
                     default:
-                        token = LEX_ERROR;
+                        token = retorno_lexico(LEX_ERROR);
                         break;
                 }
             }
             else {
                 switch (c) {
                     case '(':
-                        token = T_OPEN_PARENTESIS;
+                        token = retorno_lexico(T_OPEN_PARENTESIS);
                         break;
                     case ')':
-                        token = T_CLOSE_PARENTESIS;
+                        token = retorno_lexico(T_CLOSE_PARENTESIS);
                         break;
                     case ',':
-                        token = T_COMMA;
+                        token = retorno_lexico(T_COMMA);
                         break;
                     case ';':
-                        token = T_SEMICOLON;
+                        token = retorno_lexico(T_SEMICOLON);
                         break;
                     case '+':
-                        token = T_ADD;
+                        token = retorno_lexico(T_ADD);
                         break;
                     case '-':
-                        token = T_SUBTRACT;
+                        token = retorno_lexico(T_SUBTRACT);
                         break;
                     case '*':
-                        token = T_MULTIPLY;
+                        token = retorno_lexico(T_MULTIPLY);
                         break;
                     default:
-                        token = LEX_ERROR;
+                        token = retorno_lexico(LEX_ERROR);
                         break;
                 }
             }
