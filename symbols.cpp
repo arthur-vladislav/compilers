@@ -1,3 +1,5 @@
+// teste_endereco.cpp : Este arquivo contém a função 'main'. A execução do programa começa e termina ali.
+//
 /*
 Arthur Pereira
 Henrique Schiess Pertussati
@@ -7,10 +9,13 @@ Ian Paixão
 #include <iostream>
 #include <regex>
 #include "DICIONARIO.h"
+#include<vector>
 #define NO_TYPE 0
-#define TYPE_BOOLEAN 1
+#define TYPE_INTEGER 1
+#define TYPE_BYTE 2
+#define TYPE_BOOLEAN 3
+#define TYPE_STRING 4
 #define T_NEW_ID 101
-#define TYPE_INTEGER 2
 typedef unsigned char BYTE;
 using namespace std;
 
@@ -22,6 +27,7 @@ public:
 	char classe; // v = variavel; c =const; b = blank
 	int token;
 	int tipo;
+	void* valor;
 
 	ID() {
 
@@ -36,6 +42,12 @@ public:
 
 	}//fim construtor
 
+	void set_valor(void* valor) {
+
+		this->valor = valor;
+
+	}
+
 
 };
 
@@ -46,11 +58,64 @@ private:
 public:
 
 	unordered_map<string, ID> symbols;
-	unordered_map<string, int> valores_int;
-	unordered_map<string, BYTE> valores_byte;
-	unordered_map<string, string> valores_string;
-	unordered_map<string, bool> valores_bool;
+	vector<int> valores_int;
+	//vector<BYTE> valores_byte;
+	vector<string> valores_string;
+	vector<bool> valores_bool;
 	string ultimo_adicionado;
+
+
+	void add_valor(string id, int valor) {
+
+		valores_int.push_back(valor);
+		this->symbols[id].set_valor(&valores_int[valores_int.size() - 1]);
+
+
+	}
+
+	void* add_valor(int valor) {
+
+		valores_int.push_back(valor);
+		
+		return &(valores_int[valores_int.size() - 1]);
+
+
+	}
+
+	void add_valor(string id, string valor) {
+
+		valores_string.push_back(valor);
+		this->symbols[id].set_valor(&valores_string[valores_string.size() - 1]);
+
+
+	}
+
+	void* add_valor(string valor) {
+
+		valores_string.push_back(valor);
+
+		return &(valores_string[valores_string.size() - 1]);
+
+
+	}
+
+	void add_valor(string id, bool valor) {
+
+		valores_bool.push_back(valor);
+		this->symbols[id].set_valor(&valores_bool[valores_bool.size() - 1]);
+
+
+	}
+
+	/*
+	void add_valor(string id, BYTE valor) {
+
+		valores_byte.push_back(valor);
+		this->symbols[id].set_valor(&valores_byte[valores_byte.size() - 1]);
+
+
+	}
+	*/
 
 	tabela_simbolos() {
 		this->symbols["const"] = ID('b', 1, NO_TYPE);
@@ -88,6 +153,9 @@ public:
 		this->symbols["boolean"] = ID('b', 33, NO_TYPE);
 		this->symbols["true"] = ID('c', 34, TYPE_BOOLEAN);
 		this->symbols["false"] = ID('c', 34, TYPE_BOOLEAN);
+		add_valor("true", true);
+		add_valor("false", false);
+
 
 		ultimo_adicionado = "false";
 
@@ -101,6 +169,15 @@ public:
 
 		return T_NEW_ID;
 		//return 0;
+
+	}// fim eh_palavra_reservada
+
+	bool eh_palavra_reservada_bool(string string) {
+
+		for (auto it = symbols.cbegin(); it != symbols.cend(); ++it)
+			if (string == (*it).first) return true;
+
+		return false;
 
 	}// fim eh_palavra_reservada
 
@@ -153,18 +230,22 @@ int main() {
 	assert(i != m.end());
 	cout << "Key: " << i->first << " Value: " << i->second << '\n';
 	return 0;
-	
 
-	tabela_simbolos symbols;
-	symbols.add_id("42", 'b', 0);//instancia da tabela_simbolos
-	symbols.print_tabela();
-	bool r = symbols.eh_palavra_reservada("while");
-	cout << r << endl;
-	r = symbols.eh_palavra_reservada("hu3");
-	cout << r << endl;
-	symbols.symbols.at(symbols.ultimo_adicionado) = ID('c', 35, TYPE_INTEGER);
-	symbols.print_tabela();
 
+tabela_simbolos symbols;
+symbols.add_id("42", 'b', 0);//instancia da tabela_simbolos
+symbols.print_tabela();
+bool r = symbols.eh_palavra_reservada("while");
+cout << r << endl;
+r = symbols.eh_palavra_reservada("hu3");
+cout << r << endl;
+symbols.symbols.at(symbols.ultimo_adicionado) = ID('c', 35, TYPE_INTEGER);
+symbols.print_tabela();
+bool x = &symbols.symbols.at("true").valor;
+bool* y = (bool*)symbols.symbols.at("true").valor;
+//cout << &(symbols.symbols.at("true").valor) << endl;
+cout << x << endl;
+cout << &y << endl;
 
 }
 */

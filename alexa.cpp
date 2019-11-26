@@ -39,7 +39,7 @@ class Analisador_Lexico{
                                   'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','X','W','Y','Z',
 								  '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
 								  '.', ',', ':', '[', ']', '+', '-', '*', '/', ';', '"', '\'', ' ', '\n', '\r', '\t', '>', '<', '=', '{', '}', '!', '&', '(', ')', '?', '_'};
-		tabela_simbolos table;
+		
         char* file_name;
 		void return_C() {
             if (!this->entrada.eof())
@@ -60,6 +60,7 @@ class Analisador_Lexico{
     public:
 
 		int line;
+		tabela_simbolos table;
 		ifstream entrada;
 
 		Analisador_Lexico() {
