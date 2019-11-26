@@ -20,6 +20,7 @@ void procedimento_E2();
 void procedimento_E3();
 void semantico_ERRO_1(string id);
 void semantico_ERRO_1_B(string id);
+void semantico_ERRO_1_C(int pos_filho);
 void semantico_ERRO_2(int valor_lido);
 void semantico_ERRO_3(int pos_filho);
 void semantico_ERRO_4(string id);
@@ -149,13 +150,17 @@ void procedimento_C() {
 
 		marry_token(T_WRITE);
 		marry_token(T_OPEN_PARENTESIS);
+		pos_filho = procedimentos.size();
 		procedimento_E();
+		semantico_ERRO_1_C(pos_filho);
 		//if (fazer_semantico) write_val += to_string(E.val); //semantico_2
 
 		while (tok.TOKEN == T_COMMA) {
 
 			marry_token(T_COMMA);
+			pos_filho = procedimentos.size();
 			procedimento_E();
+			semantico_ERRO_1_C(pos_filho);
 			// if (fazer_semantico) write_val += to_string(E.val); //semantico_2
 
 		}//fim while
@@ -170,13 +175,17 @@ void procedimento_C() {
 
 		marry_token(T_WRITELN);
 		marry_token(T_OPEN_PARENTESIS);
+		pos_filho = procedimentos.size();
 		procedimento_E();
+		semantico_ERRO_1_C(pos_filho);
 		// if (fazer_semantico) write_val += to_string(E.val); //semantico_2
 
 		while (tok.TOKEN == T_COMMA) {
 
 			marry_token(T_COMMA);
+			pos_filho = procedimentos.size();
 			procedimento_E();
+			semantico_ERRO_1_C(pos_filho);
 			//if (fazer_semantico) write_val += to_string(E.val); //semantico_2
 
 		}//fim while
@@ -589,7 +598,7 @@ void procedimento_E1() {
 		else {
 		
 			marry_token(T_OR);
-			semantico_19(pos_procedimento);
+			//semantico_19(pos_procedimento);
 
 		}//fim else
 
@@ -638,7 +647,7 @@ void procedimento_E2() {
 		else {
 
 			marry_token(T_AND);
-			semantico_19(pos_procedimento);
+			//semantico_19(pos_procedimento);
 		
 		}//fim else
 	
@@ -752,7 +761,18 @@ void semantico_ERRO_1_B(string id){
 	}//fim if
 
 
-}
+}//
+
+void semantico_ERRO_1_C(int pos_filho){
+
+	if(procedimentos[pos_filho].tipo == TYPE_BOOLEAN) {
+
+		cout << alexa.line << ":" << "tipos incompatíveis. " << endl;
+		exit(0);
+	
+	}//fim if
+
+}//
 
 /*
 void semantico_ERRO_2(int valor_lido) {
