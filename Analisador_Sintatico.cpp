@@ -290,12 +290,13 @@ void procedimento_C() {
 		marry_token(T_ID);
 		if (fazer_semantico) semantico_ERRO_1(id);
 		if (fazer_semantico) semantico_ERRO_4(id);
-		id = tok.lexema;
+		string v = tok.lexema;
 
 		marry_token(T_ASSIGN);
 
 		pos_filho = procedimentos.size();
 		procedimento_E();
+		cout << endl << procedimentos[pos_filho].tipo << endl;
 		if (fazer_semantico) semantico_ERRO_5(id, pos_filho);
 		//if (fazer_semantico) semantico_7(id, pos_filho);
 
@@ -330,7 +331,9 @@ void procedimento_D() {
 		semantico_8(operacao, id);
 		pos_filho = procedimentos.size();
 		procedimento_D1(operacao);
-		semantico_ERRO_5(id, pos_filho);
+
+		if (procedimentos[pos_filho].tipo > 0)
+			semantico_ERRO_5(id, pos_filho);
 		//semantico_9(id, pos_filho);
 
 	}//fim if
@@ -345,7 +348,8 @@ void procedimento_D() {
 		semantico_8(operacao, id);
 		pos_filho = procedimentos.size();
 		procedimento_D1(operacao);
-		semantico_ERRO_5(id, pos_filho);
+		if (procedimentos[pos_filho].tipo > 0)
+			semantico_ERRO_5(id, pos_filho);
 		//semantico_9(id, pos_filho);
 
 	
@@ -361,7 +365,8 @@ void procedimento_D() {
 		semantico_8(operacao, id);
 		pos_filho = procedimentos.size();
 		procedimento_D1(operacao);
-		semantico_ERRO_5(id, pos_filho);
+		if (procedimentos[pos_filho].tipo > 0)
+			semantico_ERRO_5(id, pos_filho);
 		//semantico_9(id, pos_filho);
 	}//fim if
 
@@ -374,7 +379,8 @@ void procedimento_D() {
 		semantico_8(operacao, id);
 		pos_filho = procedimentos.size();
 		procedimento_D1(operacao);
-		semantico_ERRO_5(id, pos_filho);
+		if (procedimentos[pos_filho].tipo > 0)
+			semantico_ERRO_5(id, pos_filho);
 		//semantico_9(id, pos_filho);
 
 	}//fim if
@@ -386,17 +392,21 @@ void procedimento_D() {
 		marry_token(T_NEW_ID);
 		semantico_ERRO_6(id);
 		semantico_10(id);
+		cout << id << endl;
 		marry_token(T_ASSIGN);
 		if (tok.TOKEN == T_SUBTRACT) {
-
+			
 			marry_token(T_SUBTRACT);
 
 		}//fim if
-
-		id = tok.lexema;
+		
+		string v = tok.lexema;
 		marry_token(T_VALUE);
+		cout << v << endl;
 		semantico_21_C(pos_procedimento, id);
+		cout << "pos sem 21c" << endl;
 		semantico_22(id, pos_procedimento);
+		cout << "pos sem 22" << endl;
 
 	}//fim else
 
@@ -589,6 +599,7 @@ void procedimento_E2() {
 	pos_filho = procedimentos.size();
 	procedimento_E3();
 	semantico_13(pos_procedimento, pos_filho);
+	//cout << procedimentos[pos_procedimento].tipo << endl;
 
 	while (tok.TOKEN == T_MULTIPLY || tok.TOKEN == T_DIVIDE || tok.TOKEN == T_AND) {
 
@@ -663,8 +674,11 @@ void procedimento_E3() {
 	else {
 	
 		id = tok.lexema;
+		//cout << id << endl;
 		marry_token(T_VALUE);
 		semantico_21_C(pos_procedimento, id);
+		cout << procedimentos[pos_procedimento].tipo << endl;
+		//cout << id << endl;
 
 	}//fim else
 
@@ -1046,9 +1060,11 @@ void semantico_21_B(int pos_procedimento, string id) {
 
 void semantico_21_C(int pos_procedimento, string id) {
 
+	cout << id[0] << endl;
 	//STRING
-	if (id[0] = '\'') {
-
+	if (id[0] == '\'') {
+	
+		cout << "vc eh burro?" << endl;
 		procedimentos[pos_procedimento].tipo = TYPE_STRING;
 		//procedimentos[pos_procedimento].valor = alexa.table.add_valor(lexema);
 	
@@ -1380,7 +1396,7 @@ void semantico_21_C(int pos_procedimento, string id) {
 	//INTEIRO
 	else {
 
-		int inteiro = stoi(id);
+		//int inteiro = stoi(id);
 
 		procedimentos[pos_procedimento].tipo = TYPE_INTEGER;
 		//procedimentos[pos_procedimento].valor = alexa.table.add_valor(inteiro);		
