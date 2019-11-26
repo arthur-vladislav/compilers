@@ -185,7 +185,7 @@ class Analisador_Lexico{
             int token = table.eh_palavra_reservada(lexema);
             if (token == 101) {
 				token = T_NEW_ID;
-                table.add_id(lexema, 'b', 0);
+                //table.add_id(lexema, 'b', 0);
             }//fim if
             return_C();
             // cout << c << endl;

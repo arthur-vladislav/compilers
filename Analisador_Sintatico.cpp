@@ -1,8 +1,10 @@
 #include <iostream>
 #include <fstream>
 #include <stdlib.h>
+#include <sstream>
 #include "alexa.cpp"
 #include "DICIONARIO.h"
+
 using namespace std;
 
 //DEFININDO FUNCOES
@@ -17,6 +19,7 @@ void procedimento_E1();
 void procedimento_E2();
 void procedimento_E3();
 void semantico_ERRO_1(string id);
+void semantico_ERRO_1_B(string id);
 void semantico_ERRO_2(int valor_lido);
 void semantico_ERRO_3(int pos_filho);
 void semantico_ERRO_4(string id);
@@ -113,6 +116,7 @@ void procedimento_S(){
 
 void procedimento_C() {
 
+	//cout << "oi2" << endl;
 	int pos_procedimento, pos_filho, pos_filho_2, operacao;
 	pos_procedimento = procedimentos.size();
 	procedimentos.push_back(Procedimento(procedimentos.size()));
@@ -128,7 +132,7 @@ void procedimento_C() {
 		id = tok.lexema;
 		marry_token(T_ID);
 
-		if (fazer_semantico) semantico_ERRO_1(id);
+		if (fazer_semantico) semantico_ERRO_1_B(id);
 		if (fazer_semantico) semantico_ERRO_4(id);
 
 		marry_token(T_CLOSE_PARENTESIS);
@@ -242,7 +246,7 @@ void procedimento_C() {
 
 				procedimento_C();
 
-			}//fim shile
+			}//fim while
 
 			marry_token(T_END);
 
@@ -296,10 +300,10 @@ void procedimento_C() {
 
 		pos_filho = procedimentos.size();
 		procedimento_E();
-		cout << endl << procedimentos[pos_filho].tipo << endl;
+		//cout << "oi3" << endl;
+		//cout << endl << procedimentos[pos_filho].tipo << endl;
 		if (fazer_semantico) semantico_ERRO_5(id, pos_filho);
 		//if (fazer_semantico) semantico_7(id, pos_filho);
-
 		marry_token(T_SEMICOLON);
 
 	}//fim if
@@ -323,7 +327,7 @@ void procedimento_D() {
 
 	if (tok.TOKEN == T_INTEGER) {
 	
-		operacao = T_INTEGER;
+		operacao = TYPE_INTEGER;
 		marry_token(T_INTEGER);
 		id = tok.lexema;
 		marry_token(T_NEW_ID);
@@ -340,7 +344,7 @@ void procedimento_D() {
 
 	else if (tok.TOKEN == T_BOOLEAN) {
 
-		operacao = T_BOOLEAN;
+		operacao = TYPE_BOOLEAN;
 		marry_token(T_BOOLEAN);
 		id = tok.lexema;
 		marry_token(T_NEW_ID);
@@ -357,7 +361,7 @@ void procedimento_D() {
 
 	else if (tok.TOKEN == T_BYTE) {
 
-		operacao = T_BYTE;
+		operacao = TYPE_BYTE;
 		marry_token(T_BYTE);
 		id = tok.lexema;
 		marry_token(T_NEW_ID);
@@ -372,7 +376,7 @@ void procedimento_D() {
 
 	else if (tok.TOKEN == T_STRING) {
 	
-		operacao = T_STRING;
+		operacao = TYPE_STRING;
 		marry_token(T_STRING);
 		id = tok.lexema;
 		marry_token(T_NEW_ID);
@@ -392,7 +396,7 @@ void procedimento_D() {
 		marry_token(T_NEW_ID);
 		semantico_ERRO_6(id);
 		semantico_10(id);
-		cout << id << endl;
+		//cout << id << endl;
 		marry_token(T_ASSIGN);
 		if (tok.TOKEN == T_SUBTRACT) {
 			
@@ -402,11 +406,11 @@ void procedimento_D() {
 		
 		string v = tok.lexema;
 		marry_token(T_VALUE);
-		cout << v << endl;
-		semantico_21_C(pos_procedimento, id);
-		cout << "pos sem 21c" << endl;
+		// << v << endl;
+		semantico_21_C(pos_procedimento, v);
+		//cout << "pos sem 21c" << endl;
 		semantico_22(id, pos_procedimento);
-		cout << "pos sem 22" << endl;
+		//cout << "pos sem 22" << endl;
 
 	}//fim else
 
@@ -425,6 +429,7 @@ void procedimento_D1(int operacao) {
 		pos_filho = procedimentos.size();
 		procedimento_E();
 		semantico_11(pos_procedimento, pos_filho);
+		//cout << procedimentos[pos_procedimento].tipo << endl;
 		procedimento_D2(operacao);
 
 
@@ -475,6 +480,7 @@ void procedimento_E() {
 	pos_filho = procedimentos.size();
 	procedimento_E1();
 	semantico_13(pos_procedimento, pos_filho);
+	//cout << procedimentos[pos_procedimento].tipo << endl;
 
 	if (tok.TOKEN == T_LESSER_THAN || tok.TOKEN == T_GREATER_THAN || tok.TOKEN == T_NOT_EQUAL || tok.TOKEN == T_EQUALS || tok.TOKEN == T_GREATER_THAN_EQUAL || tok.TOKEN == T_LESSER_THAN_EQUAL ) {
 
@@ -525,9 +531,13 @@ void procedimento_E() {
 	
 	}//fim if
 
+	//cout << "oi" << endl;
+
 }//fim E
 
 void procedimento_E1() {
+
+	bool flag_sub = false;
 
 	int pos_procedimento, pos_filho, pos_filho_2, operacao;
 	pos_procedimento = procedimentos.size();
@@ -544,7 +554,8 @@ void procedimento_E1() {
 		else {
 
 			marry_token(T_SUBTRACT);
-			semantico_15(pos_procedimento);
+			flag_sub = true; //semantico 15.1
+			
 		
 		}//fim else	
 
@@ -552,8 +563,12 @@ void procedimento_E1() {
 
 	pos_filho = procedimentos.size();
 	procedimento_E2();
+	//cout << procedimentos[pos_filho].tipo << endl;
+	semantico_13(pos_procedimento, pos_filho);
+	if(flag_sub == true) semantico_15(pos_procedimento);
 	semantico_ERRO_11(pos_procedimento, pos_filho);
 	semantico_16(pos_procedimento, pos_filho);
+	//cout << procedimentos[pos_procedimento].tipo << endl;
 
 	while (tok.TOKEN == T_ADD || tok.TOKEN == T_SUBTRACT || tok.TOKEN == T_OR) {
 
@@ -574,19 +589,22 @@ void procedimento_E1() {
 		else {
 		
 			marry_token(T_OR);
-			semantico_17(pos_procedimento);
+			semantico_19(pos_procedimento);
 
 		}//fim else
 
+		//cout << procedimentos[pos_procedimento].tipo << endl;
+		semantico_ERRO_13(pos_procedimento, operacao);
 		semantico_ERRO_12(operacao, pos_filho);
 		pos_filho_2 = procedimentos.size();
 		procedimento_E2();
 		semantico_ERRO_10(pos_filho, pos_filho_2);
-
-		semantico_18(pos_procedimento, pos_filho, pos_filho_2, operacao);
+		//semantico_18(pos_procedimento, pos_filho, pos_filho_2, operacao);
+		//cout << procedimentos[pos_procedimento].tipo << endl;
 	
 	}//fim while
 
+	
 }//fim E()
 
 
@@ -677,7 +695,7 @@ void procedimento_E3() {
 		//cout << id << endl;
 		marry_token(T_VALUE);
 		semantico_21_C(pos_procedimento, id);
-		cout << procedimentos[pos_procedimento].tipo << endl;
+		//cout << procedimentos[pos_procedimento].tipo << endl;
 		//cout << id << endl;
 
 	}//fim else
@@ -688,14 +706,16 @@ int marry_token(int expected_token){
 
 	// cout << "token esperado: " << expected_token << "	token: " << tok << endl; //DEBBUG
 
-	if (tok.TOKEN != expected_token) {
+	if (tok.TOKEN != expected_token){
+
 		string msg = "TOKEN NAO ESPERADO";
+		cout << expected_token << endl;
 		if (tok.TOKEN == LEX_ERROR) msg = "LEXEMA INVALIDO";
 		if (tok.TOKEN == UNEXPECTED_EOF) msg = "EOF NAO ESPERADO";
 		if (tok.TOKEN == INVALID_CHAR) msg = "CARACTERE INVALIDO"; 
 		if (tok.TOKEN == T_ID && expected_token == T_NEW_ID) msg = "IDENTIFICADOR JA DECLARADO: " + tok.lexema;
 		if (tok.TOKEN == T_NEW_ID && expected_token == T_ID) msg = "IDENTIFICADOR NAO DECLARADO: " + tok.lexema;
-		cout << "linha " << alexa.line  << ": "<< msg << " [" << tok.TOKEN << "]" << endl;
+		cout << alexa.line  << ": "<< msg << " [" << tok.TOKEN << "]" << endl;
 		exit(0);
 
 	}//fim if
@@ -708,7 +728,18 @@ void semantico_ERRO_1(string id) {
 
 	if (alexa.table.eh_palavra_reservada_bool(id) == false) {
 
-		cout << alexa.line << ":" << "identificador não declarado " << " [" << id << "]" << endl;
+		cout << alexa.line << ":" << "identificador nao declarado " << " [" << id << "]" << endl;
+		exit(0);
+
+	}//fim if
+
+}//
+
+void semantico_ERRO_1_B(string id){
+
+	if (alexa.table.eh_palavra_reservada_bool(id) == false) {
+
+		cout << alexa.line << ":" << "identificador nao declarado " << " [" << id << "]" << endl;
 		exit(0);
 
 	}//fim if
@@ -719,9 +750,9 @@ void semantico_ERRO_1(string id) {
 		exit(0);
 	
 	}//fim if
-	
 
-}//
+
+}
 
 /*
 void semantico_ERRO_2(int valor_lido) {
@@ -780,7 +811,8 @@ void semantico_ERRO_5(string id, int pos_filho){
 	if ((!(alexa.table.symbols.at(id).tipo == TYPE_INTEGER && procedimentos[pos_filho].tipo == TYPE_BYTE)) &&
 		(alexa.table.symbols.at(id).tipo != procedimentos[pos_filho].tipo)) {
 
-		cout << alexa.line << ":" << "tipos incompatíveis. " << endl;
+		//cout << endl << alexa.table.symbols.at(id).tipo << " " << procedimentos[pos_filho].tipo << endl;
+		cout << alexa.line << ":" << "tipos incompativeis. " << endl;
 		exit(0);
 
 	}//fim if
@@ -801,10 +833,10 @@ void semantico_ERRO_6(string id) {
 
 void semantico_ERRO_9(int pos_procedimento, int operacao) {
 
-	if ((operacao == T_LESSER_THAN || operacao == T_GREATER_THAN || operacao == T_LESSER_THAN_EQUAL || operacao == T_GREATER_THAN_EQUAL) &&
+	if ((operacao == T_LESSER_THAN || operacao == T_GREATER_THAN || operacao == T_LESSER_THAN_EQUAL || operacao == T_GREATER_THAN_EQUAL || T_EQUALS) &&
 		(procedimentos[pos_procedimento].tipo == TYPE_STRING || procedimentos[pos_procedimento].tipo == TYPE_BOOLEAN)) {
 	
-		cout << alexa.line << ":" << "tipos incompatíveis. " << endl;
+		cout << alexa.line << ":" << "tipos incompativeis. " << endl;
 		exit(0);
 	
 	}//fim if
@@ -819,7 +851,7 @@ void semantico_ERRO_10(int pos_filho, int pos_filho_2) {
 		(!(procedimentos[pos_filho].tipo == TYPE_BYTE && procedimentos[pos_filho_2].tipo == TYPE_INTEGER)) &&
 		(procedimentos[pos_filho].tipo != procedimentos[pos_filho_2].tipo)){
 
-		cout << alexa.line << ":" << "tipos incompatíveis. " << endl;
+		cout << alexa.line << ":" << "tipos incompativeis. " << endl;
 		exit(0);
 	
 	}//fim if
@@ -830,7 +862,7 @@ void semantico_ERRO_11(int pos_procedimento, int pos_filho) {
 
 	if (procedimentos[pos_procedimento].tipo == TYPE_INTEGER && (procedimentos[pos_filho].tipo != TYPE_INTEGER && procedimentos[pos_filho].tipo != TYPE_BYTE)){
 
-		cout << alexa.line << ":" << "tipos incompatíveis. " << endl;
+		cout << alexa.line << ":" << "tipos incompativeis. " << endl;
 		exit(0);
 
 	}//fim if
@@ -844,13 +876,13 @@ void semantico_ERRO_12(int operacao, int pos_filho) {
 
 	case T_ADD: if (procedimentos[pos_filho].tipo == TYPE_BOOLEAN) {
 	
-			cout << alexa.line << ":" << "tipos incompatíveis. " << endl;
+			cout << alexa.line << ":" << "tipos incompativeis. " << endl;
 			exit(0);
 		}//fim if
 		break;
 	case T_SUBTRACT: if (procedimentos[pos_filho].tipo == TYPE_BOOLEAN || procedimentos[pos_filho].tipo == TYPE_STRING) {
 	
-			cout << alexa.line << ":" << "tipos incompatíveis. " << endl;
+			cout << alexa.line << ":" << "tipos incompativeis. " << endl;
 			exit(0);
 	
 		}//fim if
@@ -858,7 +890,7 @@ void semantico_ERRO_12(int operacao, int pos_filho) {
 
 	case T_OR:if (procedimentos[pos_filho].tipo == TYPE_STRING) {
 
-		cout << alexa.line << ":" << "tipos incompatíveis. " << endl;
+		cout << alexa.line << ":" << "tipos incompativeis. " << endl;
 		exit(0);
 
 	
@@ -876,7 +908,7 @@ void semantico_ERRO_13(int pos_procedimento, int operacao) {
 	if((operacao == T_MULTIPLY || operacao == T_DIVIDE) &&
 		(procedimentos[pos_procedimento].tipo == TYPE_STRING || procedimentos[pos_procedimento].tipo == TYPE_BOOLEAN)) {
 
-	    cout << alexa.line << ":" << "tipos incompatíveis. " << endl;
+	    cout << alexa.line << ":" << "tipos incompativeis. " << endl;
 	    exit(0);
 
 
@@ -884,10 +916,18 @@ void semantico_ERRO_13(int pos_procedimento, int operacao) {
 
 	else if (procedimentos[pos_procedimento].tipo == TYPE_STRING) {
 
-		cout << alexa.line << ":" << "tipos incompatíveis. " << endl;
+		cout << alexa.line << ":" << "tipos incompativeis. " << endl;
 		exit(0);
 	
 	}//fim else if
+
+	if(operacao == T_DIVIDE && procedimentos[pos_procedimento].tipo == TYPE_BYTE){
+
+	    cout << alexa.line << ":" << "tipos incompativeis. " << endl;
+	    exit(0);
+
+
+	}//fim if
 
 }//
 
@@ -895,7 +935,7 @@ void semantico_ERRO_14(int pos_procedimento) {
 
 	if (procedimentos[pos_procedimento].tipo != TYPE_BOOLEAN) {
 
-		cout << alexa.line << ":" << "tipos incompatíveis. " << endl;
+		cout << alexa.line << ":" << "tipos incompativeis. " << endl;
 		exit(0);
 	
 	}//fim if
@@ -928,6 +968,7 @@ void semantico_7(string identificador, int pos_filho) {
 void semantico_8(int operacao, string id){
 
 	alexa.table.add_id(id, 'v', operacao);
+	//cout << "o: " << alexa.table.symbols.at(id).tipo << endl;
 
 }//
 
@@ -1016,9 +1057,10 @@ void semantico_19(int pos_procedimento){
 
 }//
 
-/*
+
 void semantico_20(int pos_procedimento, int pos_filho, int operacao){
 
+	/*
 	switch (operacao) {
 
 	case T_MULTIPLY: procedimentos[pos_procedimento].valor = alexa.table.add_valor(*(int*)procedimentos[pos_procedimento + 1].valor * *(int*)procedimentos[pos_filho].valor);
@@ -1038,10 +1080,10 @@ void semantico_20(int pos_procedimento, int pos_filho, int operacao){
 			}
 			  break;
 	}//fim switch
-
+	*/
 
 }//
-*/
+
 
 void semantico_21_A(int pos_procedimento, int pos_filho) {
 
@@ -1060,11 +1102,11 @@ void semantico_21_B(int pos_procedimento, string id) {
 
 void semantico_21_C(int pos_procedimento, string id) {
 
-	cout << id[0] << endl;
+	//cout << id[0] << endl;
 	//STRING
 	if (id[0] == '\'') {
 	
-		cout << "vc eh burro?" << endl;
+		//cout << "vc eh burro?" << endl;
 		procedimentos[pos_procedimento].tipo = TYPE_STRING;
 		//procedimentos[pos_procedimento].valor = alexa.table.add_valor(lexema);
 	
@@ -1396,12 +1438,25 @@ void semantico_21_C(int pos_procedimento, string id) {
 	//INTEIRO
 	else {
 
-		//int inteiro = stoi(id);
+		//cout << id << endl;
+		int inteiro = stoi(id);
 
-		procedimentos[pos_procedimento].tipo = TYPE_INTEGER;
+		if(inteiro >= 0 && inteiro <= 255){
+
+			procedimentos[pos_procedimento].tipo = TYPE_BYTE;
+
+		}//fim if
+		else{
+
+			procedimentos[pos_procedimento].tipo = TYPE_INTEGER;
+
+		}//fim else
+		
 		//procedimentos[pos_procedimento].valor = alexa.table.add_valor(inteiro);		
 	
 	}//fim else
+
+	//cout << "oi" << endl;
 
 }//
 
