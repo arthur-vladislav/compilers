@@ -10,10 +10,10 @@ int marry_token(int expected_token);
 void procedimento_S();
 void procedimento_C();
 void procedimento_D();
-void procedimento_D1();
-void procedimento_D2();
+void procedimento_D1(int operacao);
+void procedimento_D2(int operacao);
 void procedimento_E();
-void procedimento_E1(int pos_pai);
+void procedimento_E1();
 void procedimento_E2();
 void procedimento_E3();
 void semantico_ERRO_1(string id);
@@ -29,7 +29,7 @@ void semantico_ERRO_12(int operacao, int pos_filho);
 void semantico_ERRO_13(int pos_procedimento, int operacao);
 void semantico_ERRO_14(int pos_procedimento);
 void semantico_1(int valor_lido);
-void semantico_5(bool boolean);
+//void semantico_5(bool boolean);
 void semantico_6(string id);
 void semantico_7(string identificador, int pos_filho);
 void semantico_8(int operacao, string id);
@@ -309,7 +309,7 @@ void procedimento_C() {
 
 	}//fim else
 
-	semantico_5(true);
+	//semantico_5(true);
 
 }//fim C
 
@@ -405,7 +405,7 @@ void procedimento_D() {
 
 void procedimento_D1(int operacao) {
 
-	int pos_procedimento, pos_filho, pos_filho_2, operacao;
+	int pos_procedimento, pos_filho, pos_filho_2;
 	pos_procedimento = procedimentos.size();
 	procedimentos.push_back(Procedimento(procedimentos.size()));
 
@@ -895,11 +895,13 @@ void semantico_1(int valor_lido) {
 
 }*/
 
+/*
 void semantico_5(int boolean) {
 
 	fazer_semantico = boolean;
 
 }//
+*/
 
 /*
 void semantico_7(string identificador, int pos_filho) {

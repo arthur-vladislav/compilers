@@ -99,13 +99,14 @@ public:
 
 	}
 
-	void add_valor(string id, bool valor) {
+	/*void add_valor(string id, bool valor) {
 
 		valores_bool.push_back(valor);
-		this->symbols[id].set_valor(&valores_bool[valores_bool.size() - 1]);
+		int pos = valores_bool.size() - 1;
+		this->symbols[id].set_valor(&valores_bool[pos]);
 
 
-	}
+	}*/
 
 	/*
 	void add_valor(string id, BYTE valor) {
